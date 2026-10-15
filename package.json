@@ -1,7 +1,7 @@
 {
-  "name": "your-game-api",
+  "name": "bomb-pass-api",
   "version": "1.0.0",
-  "description": "CHANGE_ME - one sentence about your game (CS 313 Software Engineering 1)",
+  "description": "Backend API for Bomb Pass, a multiplayer MC quiz game where wrong answers or timeouts lock the bomb pass. CS 313.",
   "main": "src/server.js",
   "scripts": {
     "start": "node src/server.js",
@@ -19,7 +19,7 @@
   "engines": {
     "node": ">=22"
   },
-  "author": "CHANGE_ME - your full name",
+  "author": "Karl Abraham M. Saboco",
   "license": "ISC",
   "dependencies": {
     "dotenv": "^18.0.7",
