@@ -60,11 +60,22 @@ Base URL: `http://localhost:3001/api/v1`
 
 ## What "completed" means in my game
 
-[One or two sentences: when does a player count as having completed a game? For example: "A player completed the game when they answered every question, even if some answers were wrong or timed out."]
+A player is considered to have completed the game if their `player_status` is `'FINISHED'`. Players with any other status (e.g., `ELIMINATED`, `FORFEITED`) are considered not completed. TIMEOUT answer events do not affect completion status.
 
 ## Tables
 
-[List your tables, one line each, in the order of your migrations.]
+users
+question_sets
+questions
+choices
+game_sessions
+players
+session_question_history
+answers
+penalties
+exp_transactions
+voucher_catalog
+voucher_redemptions
 
 ## Database scripts
 
