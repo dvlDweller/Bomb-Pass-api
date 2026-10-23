@@ -1,70 +1,62 @@
 {
   "info": {
+    "_postman_id": "e91b869a-d264-4526-bbe7-72fcb449f2a1",
     "name": "Bomb Pass Week 11 Module 1 - Question Set CRUD",
     "description": "Postman collection for testing Question Set Full CRUD (Module 1, Step 4).\n\nSeeded accounts used:\n- host: school_id 2099-0001 (Host Account, HOST role)\n- otherHost: school_id 2099-0003 (Second Host, HOST role)\n- player: school_id 2099-1001 (Alice Player, PLAYER role)\n\nCollection variables:\n- baseUrl: http://localhost:3001/api/v1\n- host, otherHost, player: school_id values for X-Demo-User header\n- setId: captured from the create response, reused across subsequent cases",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "_postman_variable_scope": "collection"
+    "_exporter_id": "59139285",
+    "_collection_link": "https://go.postman.co/collection/59139285-e91b869a-d264-4526-bbe7-72fcb449f2a1?source=collection_link"
   },
-  "variable": [
-    { "key": "baseUrl", "value": "http://localhost:3001/api/v1", "type": "string" },
-    { "key": "host", "value": "2099-0001", "type": "string" },
-    { "key": "otherHost", "value": "2099-0003", "type": "string" },
-    { "key": "player", "value": "2099-1001", "type": "string" },
-    { "key": "setId", "value": "", "type": "string" }
-  ],
   "item": [
     {
       "name": "1. Create a question set successfully",
-      "request": {
-        "method": "POST",
-        "header": [
-          { "key": "X-Demo-User", "value": "{{host}}", "description": "Authenticated as host (school_id 2099-0001)" },
-          { "key": "Content-Type", "value": "application/json" }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\n  \"title\": \"Week 11 Sample Set\",\n  \"description\": \"Test question set for Module 1\",\n  \"subject\": \"General Knowledge\",\n  \"grade_level\": \"10\"\n}"
-        },
-        "url": "{{baseUrl}}/question-sets"
-      },
-      "response": [],
       "event": [
         {
           "listen": "test",
           "script": {
+            "type": "text/javascript",
             "exec": [
-              "pm.test(\"Status is 201\", function () {",
-              "  pm.response.to.have.status(201);",
-              "});",
-              "pm.test(\"Response contains question_set object\", function () {",
-              "  const json = pm.response.json();",
-              "  pm.expect(json.question_set).to.be.an('object');",
-              "  pm.expect(json.question_set.question_set_id).to.be.a('number');",
-              "  pm.expect(json.question_set.title).to.eql('Week 11 Sample Set');",
-              "});",
-              "pm.collectionVariables.set(\"setId\", pm.response.json().question_set.question_set_id);",
-              "console.log(\"Captured setId:\", pm.collectionVariables.get(\"setId\"));"
-            ],
-            "type": "text/javascript"
+              "pm.test(\"Status is 201\", function () {\n  pm.response.to.have.status(201);\n});\npm.test(\"Response contains question_set object\", function () {\n  const json = pm.response.json();\n  pm.expect(json.question_set).to.be.an('object');\n  pm.expect(json.question_set.question_set_id).to.be.a('number');\n  pm.expect(json.question_set.title).to.eql('Week 11 Sample Set');\n});\npm.collectionVariables.set(\"setId\", pm.response.json().question_set.question_set_id);\nconsole.log(\"Captured setId:\", pm.collectionVariables.get(\"setId\"));\n\npm.collectionVariables.set(\n  \"ownerUserId\",\n  pm.response.json().question_set.owner_user_id\n);"
+            ]
           }
         }
-      ]
-    },
-    {
-      "name": "2. Invalid request fields",
+      ],
       "request": {
         "method": "POST",
         "header": [
-          { "key": "X-Demo-User", "value": "{{host}}", "description": "Authenticated as host" },
-          { "key": "Content-Type", "value": "application/json" }
+          {
+            "key": "X-Demo-User",
+            "value": "{{host}}",
+            "description": "Authenticated as host (school_id 2099-0001)"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"title\": 12345\n}"
+          "raw": "{\n  \"title\": \"Week 11 Sample Set\",\n  \"description\": \"Test question set for Module 1\",\n  \"subject\": \"General Knowledge\",\n  \"grade_level\": \"10\"\n}",
+          "options": {
+            "raw": {
+              "language": "text"
+            }
+          }
         },
-        "url": "{{baseUrl}}/question-sets"
+        "url": {
+          "raw": "{{baseUrl}}/question-sets",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "question-sets"
+          ]
+        }
       },
-      "response": [],
+      "response": []
+    },
+    {
+      "name": "2. Invalid request fields",
       "event": [
         {
           "listen": "test",
@@ -81,23 +73,38 @@
             "type": "text/javascript"
           }
         }
-      ]
-    },
-    {
-      "name": "3. Malformed JSON",
+      ],
       "request": {
         "method": "POST",
         "header": [
-          { "key": "X-Demo-User", "value": "{{host}}", "description": "Authenticated as host" },
-          { "key": "Content-Type", "value": "application/json" }
+          {
+            "key": "X-Demo-User",
+            "value": "{{host}}",
+            "description": "Authenticated as host"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
         ],
         "body": {
           "mode": "raw",
-          "raw": "{invalid json"
+          "raw": "{\n  \"title\": 12345\n}"
         },
-        "url": "{{baseUrl}}/question-sets"
+        "url": {
+          "raw": "{{baseUrl}}/question-sets",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "question-sets"
+          ]
+        }
       },
-      "response": [],
+      "response": []
+    },
+    {
+      "name": "3. Malformed JSON",
       "event": [
         {
           "listen": "test",
@@ -114,16 +121,38 @@
             "type": "text/javascript"
           }
         }
-      ]
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "X-Demo-User",
+            "value": "{{host}}",
+            "description": "Authenticated as host"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{invalid json"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/question-sets",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "question-sets"
+          ]
+        }
+      },
+      "response": []
     },
     {
       "name": "4. Missing authentication",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": "{{baseUrl}}/question-sets"
-      },
-      "response": [],
       "event": [
         {
           "listen": "test",
@@ -140,18 +169,24 @@
             "type": "text/javascript"
           }
         }
-      ]
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/question-sets",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "question-sets"
+          ]
+        }
+      },
+      "response": []
     },
     {
       "name": "5. Player accessing host-only route",
-      "request": {
-        "method": "GET",
-        "header": [
-          { "key": "X-Demo-User", "value": "{{player}}", "description": "Authenticated as player (PLAYER role)" }
-        ],
-        "url": "{{baseUrl}}/question-sets"
-      },
-      "response": [],
       "event": [
         {
           "listen": "test",
@@ -168,18 +203,30 @@
             "type": "text/javascript"
           }
         }
-      ]
-    },
-    {
-      "name": "6. List question sets as the host",
+      ],
       "request": {
         "method": "GET",
         "header": [
-          { "key": "X-Demo-User", "value": "{{host}}", "description": "Authenticated as host" }
+          {
+            "key": "X-Demo-User",
+            "value": "{{player}}",
+            "description": "Authenticated as player (PLAYER role)"
+          }
         ],
-        "url": "{{baseUrl}}/question-sets"
+        "url": {
+          "raw": "{{baseUrl}}/question-sets",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "question-sets"
+          ]
+        }
       },
-      "response": [],
+      "response": []
+    },
+    {
+      "name": "6. List question sets as the host",
       "event": [
         {
           "listen": "test",
@@ -196,18 +243,30 @@
             "type": "text/javascript"
           }
         }
-      ]
-    },
-    {
-      "name": "7. Read the newly created question set",
+      ],
       "request": {
         "method": "GET",
         "header": [
-          { "key": "X-Demo-User", "value": "{{host}}", "description": "Authenticated as host" }
+          {
+            "key": "X-Demo-User",
+            "value": "{{host}}",
+            "description": "Authenticated as host"
+          }
         ],
-        "url": "{{baseUrl}}/question-sets/{{setId}}"
+        "url": {
+          "raw": "{{baseUrl}}/question-sets",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "question-sets"
+          ]
+        }
       },
-      "response": [],
+      "response": []
+    },
+    {
+      "name": "7. Read the newly created question set",
       "event": [
         {
           "listen": "test",
@@ -224,18 +283,31 @@
             "type": "text/javascript"
           }
         }
-      ]
-    },
-    {
-      "name": "8. Read a nonexistent question-set ID",
+      ],
       "request": {
         "method": "GET",
         "header": [
-          { "key": "X-Demo-User", "value": "{{host}}", "description": "Authenticated as host" }
+          {
+            "key": "X-Demo-User",
+            "value": "{{host}}",
+            "description": "Authenticated as host"
+          }
         ],
-        "url": "{{baseUrl}}/question-sets/999999"
+        "url": {
+          "raw": "{{baseUrl}}/question-sets/{{setId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "question-sets",
+            "{{setId}}"
+          ]
+        }
       },
-      "response": [],
+      "response": []
+    },
+    {
+      "name": "8. Read a nonexistent question-set ID",
       "event": [
         {
           "listen": "test",
@@ -252,18 +324,31 @@
             "type": "text/javascript"
           }
         }
-      ]
-    },
-    {
-      "name": "9. Use a nonnumeric ID",
+      ],
       "request": {
         "method": "GET",
         "header": [
-          { "key": "X-Demo-User", "value": "{{host}}", "description": "Authenticated as host" }
+          {
+            "key": "X-Demo-User",
+            "value": "{{host}}",
+            "description": "Authenticated as host"
+          }
         ],
-        "url": "{{baseUrl}}/question-sets/abc"
+        "url": {
+          "raw": "{{baseUrl}}/question-sets/999999",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "question-sets",
+            "999999"
+          ]
+        }
       },
-      "response": [],
+      "response": []
+    },
+    {
+      "name": "9. Use a nonnumeric ID",
       "event": [
         {
           "listen": "test",
@@ -280,56 +365,79 @@
             "type": "text/javascript"
           }
         }
-      ]
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "X-Demo-User",
+            "value": "{{host}}",
+            "description": "Authenticated as host"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/question-sets/abc",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "question-sets",
+            "abc"
+          ]
+        }
+      },
+      "response": []
     },
     {
       "name": "10. Update a question set as its owner",
-      "request": {
-        "method": "PATCH",
-        "header": [
-          { "key": "X-Demo-User", "value": "{{host}}", "description": "Authenticated as host (owner)" },
-          { "key": "Content-Type", "value": "application/json" }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\n  \"title\": \"Updated Sample Set\"\n}"
-        },
-        "url": "{{baseUrl}}/question-sets/{{setId}}"
-      },
-      "response": [],
       "event": [
         {
           "listen": "test",
           "script": {
+            "type": "text/javascript",
             "exec": [
-              "pm.test(\"Status is 200\", function () {",
-              "  pm.response.to.have.status(200);",
-              "});",
-              "pm.test(\"Title was updated\", function () {",
-              "  const json = pm.response.json();",
-              "  pm.expect(json.question_set.title).to.eql('Updated Sample Set');",
-              "});"
-            ],
-            "type": "text/javascript"
+              "pm.test(\"Status is 200\", function () {\n  pm.response.to.have.status(200);\n});\npm.test(\"Title was updated\", function () {\n  const json = pm.response.json();\n  pm.expect(json.question_set.title).to.eql('Updated Sample Set');\n});\n\npm.test(\"PATCH cannot change question-set ownership\", function () {\n  const json = pm.response.json();\n  const originalOwnerId = Number(\n    pm.collectionVariables.get(\"ownerUserId\")\n  );\n\n  pm.expect(json.question_set.owner_user_id).to.eql(originalOwnerId);\n});"
+            ]
           }
         }
-      ]
-    },
-    {
-      "name": "11. Update same question set as another host",
+      ],
       "request": {
         "method": "PATCH",
         "header": [
-          { "key": "X-Demo-User", "value": "{{otherHost}}", "description": "Authenticated as another host (not the owner)" },
-          { "key": "Content-Type", "value": "application/json" }
+          {
+            "key": "X-Demo-User",
+            "value": "{{host}}",
+            "description": "Authenticated as host (owner)"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"title\": \"Hacked Title\"\n}"
+          "raw": "{\n  \"title\": \"Updated Sample Set\",\n  \"owner_user_id\": 8\n}",
+          "options": {
+            "raw": {
+              "language": "text"
+            }
+          }
         },
-        "url": "{{baseUrl}}/question-sets/{{setId}}"
+        "url": {
+          "raw": "{{baseUrl}}/question-sets/{{setId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "question-sets",
+            "{{setId}}"
+          ]
+        }
       },
-      "response": [],
+      "response": []
+    },
+    {
+      "name": "11. Update same question set as another host",
       "event": [
         {
           "listen": "test",
@@ -346,23 +454,39 @@
             "type": "text/javascript"
           }
         }
-      ]
-    },
-    {
-      "name": "12. PATCH with empty JSON body",
+      ],
       "request": {
         "method": "PATCH",
         "header": [
-          { "key": "X-Demo-User", "value": "{{host}}", "description": "Authenticated as host (owner)" },
-          { "key": "Content-Type", "value": "application/json" }
+          {
+            "key": "X-Demo-User",
+            "value": "{{otherHost}}",
+            "description": "Authenticated as another host (not the owner)"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
         ],
         "body": {
           "mode": "raw",
-          "raw": "{}"
+          "raw": "{\n  \"title\": \"Hacked Title\"\n}"
         },
-        "url": "{{baseUrl}}/question-sets/{{setId}}"
+        "url": {
+          "raw": "{{baseUrl}}/question-sets/{{setId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "question-sets",
+            "{{setId}}"
+          ]
+        }
       },
-      "response": [],
+      "response": []
+    },
+    {
+      "name": "12. PATCH with empty JSON body",
       "event": [
         {
           "listen": "test",
@@ -379,18 +503,39 @@
             "type": "text/javascript"
           }
         }
-      ]
+      ],
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "X-Demo-User",
+            "value": "{{host}}",
+            "description": "Authenticated as host (owner)"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/question-sets/{{setId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "question-sets",
+            "{{setId}}"
+          ]
+        }
+      },
+      "response": []
     },
     {
       "name": "13. Delete the question set as its owner",
-      "request": {
-        "method": "DELETE",
-        "header": [
-          { "key": "X-Demo-User", "value": "{{host}}", "description": "Authenticated as host (owner)" }
-        ],
-        "url": "{{baseUrl}}/question-sets/{{setId}}"
-      },
-      "response": [],
       "event": [
         {
           "listen": "test",
@@ -406,7 +551,54 @@
             "type": "text/javascript"
           }
         }
-      ]
+      ],
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "X-Demo-User",
+            "value": "{{host}}",
+            "description": "Authenticated as host (owner)"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/question-sets/{{setId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "question-sets",
+            "{{setId}}"
+          ]
+        }
+      },
+      "response": []
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3001/api/v1"
+    },
+    {
+      "key": "host",
+      "value": "2099-0001"
+    },
+    {
+      "key": "otherHost",
+      "value": "2099-0003"
+    },
+    {
+      "key": "player",
+      "value": "2099-1001"
+    },
+    {
+      "key": "setId",
+      "value": ""
+    },
+    {
+      "key": "ownerUserId",
+      "value": ""
     }
   ]
 }

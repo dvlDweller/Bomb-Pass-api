@@ -1,4 +1,5 @@
 // Translates between HTTP and the service. No SQL, no business rules.
+const { matchedData } = require('express-validator');
 const questionSetService = require('../services/question-set.service');
 
 async function list(req, res) {
@@ -17,7 +18,8 @@ async function create(req, res) {
 }
 
 async function update(req, res) {
-  const questionSet = await questionSetService.update(Number(req.params.id), req.body, req.user);
+  const changes = matchedData(req, { locations: ['body'] });
+  const questionSet = await questionSetService.update(Number(req.params.id), changes, req.user);
   res.status(200).json({ question_set: questionSet });
 }
 
