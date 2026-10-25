@@ -2,29 +2,44 @@
 const { matchedData } = require('express-validator');
 const questionSetService = require('../services/question-set.service');
 
+function toJson(questionSet) {
+  return {
+    question_set_id: questionSet.question_set_id,
+    owner_user_id: questionSet.owner_user_id,
+    title: questionSet.title,
+    description: questionSet.description,
+    subject: questionSet.subject,
+    grade_level: questionSet.grade_level,
+  };
+}
+
 async function list(req, res) {
   const questionSets = await questionSetService.list(req.user);
-  res.status(200).json({ question_sets: questionSets });
+  res.status(200).json({ question_sets: questionSets.map(toJson) });
 }
 
 async function get(req, res) {
-  const questionSet = await questionSetService.get(Number(req.params.id), req.user);
-  res.status(200).json({ question_set: questionSet });
+  const { id } = matchedData(req, { locations: ['params'] });
+  const questionSet = await questionSetService.get(Number(id), req.user);
+  res.status(200).json({ question_set: toJson(questionSet) });
 }
 
 async function create(req, res) {
-  const questionSet = await questionSetService.create(req.body, req.user);
-  res.status(201).json({ question_set: questionSet });
+  const values = matchedData(req, { locations: ['body'] });
+  const questionSet = await questionSetService.create(values, req.user);
+  res.status(201).json({ question_set: toJson(questionSet) });
 }
 
 async function update(req, res) {
+  const { id } = matchedData(req, { locations: ['params'] });
   const changes = matchedData(req, { locations: ['body'] });
-  const questionSet = await questionSetService.update(Number(req.params.id), changes, req.user);
-  res.status(200).json({ question_set: questionSet });
+  const questionSet = await questionSetService.update(Number(id), changes, req.user);
+  res.status(200).json({ question_set: toJson(questionSet) });
 }
 
 async function remove(req, res) {
-  await questionSetService.remove(Number(req.params.id), req.user);
+  const { id } = matchedData(req, { locations: ['params'] });
+  await questionSetService.remove(Number(id), req.user);
   res.status(204).end();
 }
 
