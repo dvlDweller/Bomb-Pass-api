@@ -24,14 +24,26 @@ async function changeStatus(req, res) {
 }
 
 async function join(req, res) {
+  const { code } = matchedData(req, { locations: ['params'] });
   const data = matchedData(req, { locations: ['body'] });
   const result = await gameSessionService.joinOrRejoin(
-    req.params.code,
+    code,
     data.nickname,
     req.user
   );
   const status = result.created ? 201 : 200;
-  res.status(status).json({ session: result.session, player: result.player });
+  res.status(status).json({
+    player_id: result.player.player_id,
+    nickname: result.player.nickname,
+    score: result.player.score,
+    rejoined: !result.created,
+    session: {
+      code: result.session.join_code,
+      status: result.session.status,
+      current_cycle_number: result.session.current_cycle_number,
+      current_question_id: result.session.current_question_id,
+    },
+  });
 }
 
 async function list(req, res) {
