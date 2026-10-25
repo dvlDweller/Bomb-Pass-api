@@ -10,4 +10,10 @@
 //   },
 //
 // A constraint that is not listed here still answers 409, with the code CONFLICT.
-module.exports = {};
+module.exports = {
+  players_session_id_nickname_unique: {
+    status: 409,
+    code: 'NICKNAME_TAKEN',
+    message: 'That nickname is already used in this game.',
+  },
+};
