@@ -1,11 +1,11 @@
 {
   "info": {
-    "_postman_id": "e91b869a-d264-4526-bbe7-72fcb449f2a1",
-    "name": "Bomb Pass Week 11 Module 1 - Question Set CRUD",
-    "description": "Postman collection for testing Question Set Full CRUD (Module 1, Step 4).\n\nSeeded accounts used:\n- host: school_id 2099-0001 (Host Account, HOST role)\n- otherHost: school_id 2099-0003 (Second Host, HOST role)\n- player: school_id 2099-1001 (Alice Player, PLAYER role)\n\nCollection variables:\n- baseUrl: http://localhost:3001/api/v1\n- host, otherHost, player: school_id values for X-Demo-User header\n- setId: captured from the create response, reused across subsequent cases",
+    "_postman_id": "fa997fdc-847a-4c5d-9424-8e8d9f2a9801",
+    "name": "Bomb Pass Week 11 Module 1 - Question Set CRUD Copy",
+    "description": "Postman collection for testing Question Set Full CRUD (Module 1, Step 4) and Sessions & Joining (Module 2).\n\nSeeded accounts used:\n- host: school_id 2099-0001 (Host Account, HOST role)\n- otherHost: school_id 2099-0003 (Second Host, HOST role)\n- player: school_id 2099-1001 (Alice Player, PLAYER role)\n\nCollection variables:\n- baseUrl: http://localhost:3001/api/v1\n- host, otherHost, player: school_id values for X-Demo-User header\n- setId: captured from the create question-set response, reused across subsequent cases\n- sessionCode: captured from the create session response, reused across session cases\n- playerId, playerScore: captured from the first join, reused to verify rejoin",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
     "_exporter_id": "59139285",
-    "_collection_link": "https://go.postman.co/collection/59139285-e91b869a-d264-4526-bbe7-72fcb449f2a1?source=collection_link"
+    "_collection_link": "https://go.postman.co/collection/59139285-fa997fdc-847a-4c5d-9424-8e8d9f2a9801?source=collection_link"
   },
   "item": [
     {
@@ -16,7 +16,7 @@
           "script": {
             "type": "text/javascript",
             "exec": [
-              "pm.test(\"Status is 201\", function () {\n  pm.response.to.have.status(201);\n});\npm.test(\"Response contains question_set object\", function () {\n  const json = pm.response.json();\n  pm.expect(json.question_set).to.be.an('object');\n  pm.expect(json.question_set.question_set_id).to.be.a('number');\n  pm.expect(json.question_set.title).to.eql('Week 11 Sample Set');\n});\npm.collectionVariables.set(\"setId\", pm.response.json().question_set.question_set_id);\nconsole.log(\"Captured setId:\", pm.collectionVariables.get(\"setId\"));\n\npm.collectionVariables.set(\n  \"ownerUserId\",\n  pm.response.json().question_set.owner_user_id\n);"
+              "pm.test(\"Status is 201\", function () {\n  pm.response.to.have.status(201);\n});\n\nconst json = pm.response.json();\n\npm.test(\"Response contains the created question set\", function () {\n  pm.expect(json.question_set).to.be.an(\"object\");\n  pm.expect(json.question_set.question_set_id).to.be.a(\"number\");\n  pm.expect(json.question_set.title).to.eql(\"Week 11 Sample Set\");\n});\n\npm.collectionVariables.set(\n  \"setId\",\n  json.question_set.question_set_id\n);\n\npm.collectionVariables.set(\n  \"ownerUserId\",\n  json.question_set.owner_user_id\n);"
             ]
           }
         }
@@ -36,10 +36,10 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"title\": \"Week 11 Sample Set\",\n  \"description\": \"Test question set for Module 1\",\n  \"subject\": \"General Knowledge\",\n  \"grade_level\": \"10\"\n}",
+          "raw": "{\n  \"title\": \"Week 11 Sample Set\",\n  \"subject\": \"CS313\",\n  \"is_public\": false\n}",
           "options": {
             "raw": {
-              "language": "text"
+              "language": "json"
             }
           }
         },
@@ -236,8 +236,7 @@
               "  pm.response.to.have.status(200);",
               "});",
               "pm.test(\"Response contains question_sets array\", function () {",
-              "  const json = pm.response.json();",
-              "  pm.expect(json.question_sets).to.be.an('array');",
+              "  const json = pm.response.json();\n  pm.expect(json.question_sets).to.be.an('array');",
               "});"
             ],
             "type": "text/javascript"
@@ -573,6 +572,379 @@
         }
       },
       "response": []
+    },
+    {
+      "name": "M2 - Create Session",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status is 201\", function () {\n  pm.response.to.have.status(201);\n});\npm.test(\"Response contains session object\", function () {\n  const json = pm.response.json();\n  pm.expect(json.session).to.be.an('object');\n  pm.expect(json.session.join_code).to.be.a('string');\n  pm.expect(json.session.status).to.eql('waiting');\n});\npm.collectionVariables.set(\"sessionCode\", pm.response.json().session.join_code);\nconsole.log(\"Captured sessionCode:\", pm.collectionVariables.get(\"sessionCode\"));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "X-Demo-User",
+            "value": "{{host}}",
+            "description": "Authenticated as host (school_id 2099-0001)"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"question_set_id\": 1,\n  \"duration_limit_minutes\": 10,\n  \"bomb_time_limit_seconds\": 30\n}",
+          "options": {
+            "raw": {
+              "language": "text"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/sessions",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "sessions"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "M2 - Get Session by Code",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status is 200\", function () {\n  pm.response.to.have.status(200);\n});\npm.test(\"Session join code matches captured code\", function () {\n  const json = pm.response.json();\n  pm.expect(json.session.join_code).to.eql(pm.collectionVariables.get(\"sessionCode\"));\n});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/sessions/{{sessionCode}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "sessions",
+            "{{sessionCode}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "M2 - Reject Invalid Status",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status is 400\", function () {\n  pm.response.to.have.status(400);\n});\npm.test(\"Error code is VALIDATION_FAILED\", function () {\n  const json = pm.response.json();\n  pm.expect(json.error.code).to.eql('VALIDATION_FAILED');\n});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "X-Demo-User",
+            "value": "{{host}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"status\": \"LOBBY\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/sessions/{{sessionCode}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "sessions",
+            "{{sessionCode}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "M2 - Join Session",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status is 201\", function () {\n  pm.response.to.have.status(201);\n});\npm.test(\"Response contains session and player\", function () {\n  const json = pm.response.json();\n  pm.expect(json.session).to.be.an('object');\n  pm.expect(json.player).to.be.an('object');\n  pm.expect(json.player.player_id).to.be.a('number');\n  pm.expect(json.player.nickname).to.eql('Migo');\n   \n});\npm.collectionVariables.set(\"playerId\", pm.response.json().player.player_id);\npm.collectionVariables.set(\"playerScore\", pm.response.json().player.score);\nconsole.log(\"Captured playerId:\", pm.collectionVariables.get(\"playerId\"));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "X-Demo-User",
+            "value": "{{m2Player}}",
+            "description": "Authenticated as player (school_id 2099-1006)"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nickname\": \"Migo\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/sessions/{{sessionCode}}/players",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "sessions",
+            "{{sessionCode}}",
+            "players"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "M2 - Rejoin Existing Player",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status is 200\", function () {\n  pm.response.to.have.status(200);\n});\npm.test(\"Rejoin returns same player and score\", function () {\n  const json = pm.response.json();\n  pm.expect(json.player.player_id).to.equal(parseInt(pm.collectionVariables.get(\"playerId\")));\n  pm.expect(json.player.score).to.equal(parseInt(pm.collectionVariables.get(\"playerScore\")));\n});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "X-Demo-User",
+            "value": "{{m2Player}}",
+            "description": "Authenticated as same player (school_id 2099-1006)"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nickname\": \"Migo\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/sessions/{{sessionCode}}/players",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "sessions",
+            "{{sessionCode}}",
+            "players"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "M2 - List Session Players",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status is 200\", function () {\n  pm.response.to.have.status(200);\n});\npm.test(\"Response contains players array\", function () {\n  const json = pm.response.json();\n  pm.expect(json.players).to.be.an('array');\n  pm.expect(json.players.length).to.be.greaterThan(0);\n});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/sessions/{{sessionCode}}/players",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "sessions",
+            "{{sessionCode}}",
+            "players"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "M2 - Reject Duplicate Nickname",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status is 409\", function () {\n  pm.response.to.have.status(409);\n});\npm.test(\"Error code is NICKNAME_TAKEN\", function () {\n  const json = pm.response.json();\n  pm.expect(json.error.code).to.eql('NICKNAME_TAKEN');\n});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "X-Demo-User",
+            "value": "{{otherHost}}",
+            "description": "Authenticated as different account (school_id 2099-0003)"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nickname\": \"Migo\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/sessions/{{sessionCode}}/players",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "sessions",
+            "{{sessionCode}}",
+            "players"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "M2 - Reject Invalid Code",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status is 400\", function () {\n  pm.response.to.have.status(400);\n});\npm.test(\"Error code is VALIDATION_FAILED\", function () {\n  const json = pm.response.json();\n  pm.expect(json.error.code).to.eql('VALIDATION_FAILED');\n});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/sessions/12345",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "sessions",
+            "12345"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "M2 - Change Session Status",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status is 200\", function () {\n  pm.response.to.have.status(200);\n});\npm.test(\"Session status changed to ended\", function () {\n  const json = pm.response.json();\n  pm.expect(json.session.status).to.eql('ended');\n});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "X-Demo-User",
+            "value": "{{host}}",
+            "description": "Authenticated as host (school_id 2099-0001)"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"status\": \"ended\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/sessions/{{sessionCode}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "sessions",
+            "{{sessionCode}}"
+          ]
+        }
+      },
+      "response": []
     }
   ],
   "variable": [
@@ -599,6 +971,22 @@
     {
       "key": "ownerUserId",
       "value": ""
+    },
+    {
+      "key": "sessionCode",
+      "value": ""
+    },
+    {
+      "key": "playerId",
+      "value": ""
+    },
+    {
+      "key": "playerScore",
+      "value": ""
+    },
+    {
+      "key": "m2Player",
+      "value": "2099-1006"
     }
   ]
 }
