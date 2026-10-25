@@ -776,7 +776,7 @@
           "script": {
             "type": "text/javascript",
             "exec": [
-              "pm.test(\"Status is 201\", function () {\n  pm.response.to.have.status(201);\n});\npm.test(\"Response contains session and player\", function () {\n  const json = pm.response.json();\n  pm.expect(json.session).to.be.an('object');\n  pm.expect(json.player).to.be.an('object');\n  pm.expect(json.player.player_id).to.be.a('number');\n  pm.expect(json.player.nickname).to.eql('Migo');\n   \n});\npm.collectionVariables.set(\"playerId\", pm.response.json().player.player_id);\npm.collectionVariables.set(\"playerScore\", pm.response.json().player.score);\nconsole.log(\"Captured playerId:\", pm.collectionVariables.get(\"playerId\"));"
+              "pm.test(\"Status is 201\", function () {\n  pm.response.to.have.status(201);\n});\npm.test(\"Response contains session and player fields\", function () {\n  const json = pm.response.json();\n  pm.expect(json.session).to.be.an('object');\n  pm.expect(json.session.code).to.be.a('string');\n  pm.expect(json.session.status).to.be.a('string');\n  pm.expect(json.session.current_cycle_number).to.be.a('number');\n  pm.expect(json.session.current_question_id).to.satisfy(v => v === null || typeof v === 'number');\n  pm.expect(json.player_id).to.be.a('number');\n  pm.expect(json.nickname).to.eql('Migo');\n  pm.expect(json.score).to.be.a('number');\n  pm.expect(json.rejoined).to.eql(false);\n});\npm.collectionVariables.set(\"playerId\", pm.response.json().player_id);\npm.collectionVariables.set(\"playerScore\", pm.response.json().score);\nconsole.log(\"Captured playerId:\", pm.collectionVariables.get(\"playerId\"));"
             ]
           }
         }
@@ -874,7 +874,7 @@
           "script": {
             "type": "text/javascript",
             "exec": [
-              "pm.test(\"Status is 200\", function () {\n  pm.response.to.have.status(200);\n});\npm.test(\"Rejoin returns same player and score\", function () {\n  const json = pm.response.json();\n  pm.expect(json.player.player_id).to.equal(parseInt(pm.collectionVariables.get(\"playerId\")));\n  pm.expect(json.player.score).to.equal(parseInt(pm.collectionVariables.get(\"playerScore\")));\n});"
+              "pm.test(\"Status is 200\", function () {\n  pm.response.to.have.status(200);\n});\npm.test(\"Rejoin returns same player and score\", function () {\n  const json = pm.response.json();\n  pm.expect(json.player_id).to.equal(parseInt(pm.collectionVariables.get(\"playerId\")));\n  pm.expect(json.score).to.equal(parseInt(pm.collectionVariables.get(\"playerScore\")));\n  pm.expect(json.rejoined).to.eql(true);\n  pm.expect(json.session).to.be.an('object');\n  pm.expect(json.session.code).to.be.a('string');\n  pm.expect(json.session.status).to.be.a('string');\n  pm.expect(json.session.current_cycle_number).to.be.a('number');\n  pm.expect(json.session.current_question_id).to.satisfy(v => v === null || typeof v === 'number');\n});"
             ]
           }
         }
