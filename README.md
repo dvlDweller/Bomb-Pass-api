@@ -52,11 +52,21 @@ npm run dev
 
 Base URL: `http://localhost:3001/api/v1`
 
-| Method | Path | Purpose | Success |
+| Method | Path | Purpose | Who may call it |
 |---|---|---|---|
-| GET | /health | Is the API up and can it reach the database? | 200 (503 when the database is down) |
-| GET | /game-info | Slug, name, group, developer, description, player limits, version | 200 |
-| GET | /results | Finished games, every player, and the top 3. Needs the `X-Hub-Key` header. Optional `?since=` | 200 (401 without the key) |
+| GET | /health | Is the API up and can it reach the database? | Public |
+| GET | /game-info | Slug, name, group, developer, description, player limits, version | Public |
+| GET | /results | Finished games, every player, and the top 3. Needs `X-Hub-Key` header. Optional `?since=` | Anyone with the hub key |
+| GET | /question-sets | List all question sets | HOST or ADMIN (`X-Demo-User`) |
+| GET | /question-sets/:id | Get one question set | HOST or ADMIN (`X-Demo-User`) |
+| POST | /question-sets | Create a question set | HOST or ADMIN (`X-Demo-User`) |
+| PATCH | /question-sets/:id | Update a question set | HOST or ADMIN (`X-Demo-User`) |
+| DELETE | /question-sets/:id | Remove a question set | HOST or ADMIN (`X-Demo-User`) |
+| POST | /sessions | Create a session | HOST or ADMIN (`X-Demo-User`) |
+| GET | /sessions/:code | Retrieve a session by join code | Public |
+| PATCH | /sessions/:code | Change session status (waiting→playing/ended, playing→ended) | HOST or ADMIN (`X-Demo-User`) |
+| POST | /sessions/:code/players | Join or rejoin a session | Any authenticated user (`X-Demo-User`) |
+| GET | /sessions/:code/players | List session players | Public |
 
 ## What "completed" means in my game
 
