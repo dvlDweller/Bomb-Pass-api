@@ -36,7 +36,11 @@ async function join(req, res) {
 
 async function list(req, res) {
   const players = await gameSessionService.listPlayers(req.params.code);
-  res.status(200).json({ players: players });
+  const exposed = players.map((player) => ({
+    nickname: player.nickname,
+    score: player.score,
+  }));
+  res.status(200).json({ players: exposed });
 }
 
 module.exports = { create, get, changeStatus, join, list };
