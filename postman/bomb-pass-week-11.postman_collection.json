@@ -621,6 +621,53 @@
       "response": []
     },
     {
+      "name": "M2 - Player Create Session Rejected",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status is 403\", function () {\n  pm.response.to.have.status(403);\n});\npm.test(\"Error code is FORBIDDEN\", function () {\n  const json = pm.response.json();\n  pm.expect(json.error.code).to.eql('FORBIDDEN');\n});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "X-Demo-User",
+            "value": "{{player}}",
+            "description": "Authenticated as player (PLAYER role)"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"question_set_id\": 1,\n  \"duration_limit_minutes\": 10,\n  \"bomb_time_limit_seconds\": 30\n}",
+          "options": {
+            "raw": {
+              "language": "text"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/sessions",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "sessions"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
       "name": "M2 - Get Session by Code",
       "event": [
         {
@@ -644,6 +691,35 @@
           "path": [
             "sessions",
             "{{sessionCode}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "M2 - Valid Code Not Found",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status is 404\", function () {\n  pm.response.to.have.status(404);\n});\npm.test(\"Error code is SESSION_NOT_FOUND\", function () {\n  const json = pm.response.json();\n  pm.expect(json.error.code).to.eql('SESSION_NOT_FOUND');\n});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/sessions/123456",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "sessions",
+            "123456"
           ]
         }
       },
@@ -721,6 +797,55 @@
         "body": {
           "mode": "raw",
           "raw": "{\n  \"nickname\": \"Migo\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/sessions/{{sessionCode}}/players",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "sessions",
+            "{{sessionCode}}",
+            "players"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "M2 - Nickname Too Short",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status is 400\", function () {\n  pm.response.to.have.status(400);\n});\npm.test(\"Error code is VALIDATION_FAILED\", function () {\n  const json = pm.response.json();\n  pm.expect(json.error.code).to.eql('VALIDATION_FAILED');\n});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "X-Demo-User",
+            "value": "{{m2Player}}",
+            "description": "Authenticated as player (school_id 2099-1006)"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nickname\": \"A\"\n}",
           "options": {
             "raw": {
               "language": "json"
@@ -870,29 +995,97 @@
       "response": []
     },
     {
-      "name": "M2 - Reject Invalid Code",
+      "name": "M2 - Host Starts the Game",
       "event": [
         {
           "listen": "test",
           "script": {
             "type": "text/javascript",
             "exec": [
-              "pm.test(\"Status is 400\", function () {\n  pm.response.to.have.status(400);\n});\npm.test(\"Error code is VALIDATION_FAILED\", function () {\n  const json = pm.response.json();\n  pm.expect(json.error.code).to.eql('VALIDATION_FAILED');\n});"
+              "pm.test(\"Status is 200\", function () {\n  pm.response.to.have.status(200);\n});\npm.test(\"Session status changed to playing\", function () {\n  const json = pm.response.json();\n  pm.expect(json.session.status).to.eql('playing');\n});"
             ]
           }
         }
       ],
       "request": {
-        "method": "GET",
-        "header": [],
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "X-Demo-User",
+            "value": "{{host}}",
+            "description": "Authenticated as host (school_id 2099-0001)"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"status\": \"playing\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
         "url": {
-          "raw": "{{baseUrl}}/sessions/12345",
+          "raw": "{{baseUrl}}/sessions/{{sessionCode}}",
           "host": [
             "{{baseUrl}}"
           ],
           "path": [
             "sessions",
-            "12345"
+            "{{sessionCode}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "M2 - New Player Joins Too Late",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status is 409\", function () {\n  pm.response.to.have.status(409);\n});\npm.test(\"Error code is SESSION_NOT_JOINABLE\", function () {\n  const json = pm.response.json();\n  pm.expect(json.error.code).to.eql('SESSION_NOT_JOINABLE');\n});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "X-Demo-User",
+            "value": "{{otherHost}}",
+            "description": "Authenticated as other host (school_id 2099-0003)"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nickname\": \"LatePlayer\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/sessions/{{sessionCode}}/players",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "sessions",
+            "{{sessionCode}}",
+            "players"
           ]
         }
       },
@@ -941,6 +1134,132 @@
           "path": [
             "sessions",
             "{{sessionCode}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "M2 - Reject Status Change After Ended",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status is 409\", function () {\n  pm.response.to.have.status(409);\n});\npm.test(\"Error code is SESSION_ENDED\", function () {\n  const json = pm.response.json();\n  pm.expect(json.error.code).to.eql('SESSION_ENDED');\n});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "X-Demo-User",
+            "value": "{{host}}",
+            "description": "Authenticated as host (school_id 2099-0001)"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"status\": \"playing\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/sessions/{{sessionCode}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "sessions",
+            "{{sessionCode}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "M2 - Join After Session Ended",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status is 409\", function () {\n  pm.response.to.have.status(409);\n});\npm.test(\"Error code is SESSION_ENDED\", function () {\n  const json = pm.response.json();\n  pm.expect(json.error.code).to.eql('SESSION_ENDED');\n});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "X-Demo-User",
+            "value": "{{otherHost}}",
+            "description": "Authenticated as other host (school_id 2099-0003)"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nickname\": \"LatePlayer\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/sessions/{{sessionCode}}/players",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "sessions",
+            "{{sessionCode}}",
+            "players"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "M2 - Reject Invalid Code",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status is 400\", function () {\n  pm.response.to.have.status(400);\n});\npm.test(\"Error code is VALIDATION_FAILED\", function () {\n  const json = pm.response.json();\n  pm.expect(json.error.code).to.eql('VALIDATION_FAILED');\n});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/sessions/12345",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "sessions",
+            "12345"
           ]
         }
       },
