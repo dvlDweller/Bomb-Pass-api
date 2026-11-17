@@ -16,4 +16,14 @@ module.exports = {
     code: 'NICKNAME_TAKEN',
     message: 'That nickname is already used in this game.',
   },
+  users_school_id_unique: {
+    status: 409,
+    code: 'SCHOOL_ID_TAKEN',
+    message: 'That school ID is already registered.',
+  },
+  users_email_unique: {
+    status: 409,
+    code: 'EMAIL_TAKEN',
+    message: 'That email is already registered.',
+  },
 };
