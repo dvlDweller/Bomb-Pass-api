@@ -1,6 +1,7 @@
 // Validation rules for question-set requests.
 // Keeps request-shape rules here; business rules and DB lookups live in the service layer.
-const { param, body } = require('express-validator');
+const { param, body, query } = require('express-validator');
+const { pageRules, sortRules } = require('./list.validator');
 
 // Validates the question set ID URL parameter (:id).
 const idParam = [
@@ -72,8 +73,22 @@ const updateRules = [
   }),
 ];
 
+// Validates list query parameters for question sets.
+const listRules = [
+  ...pageRules,
+  ...sortRules(['question_set_id', 'title', 'subject', 'grade_level']),
+  query('q').optional().isString().withMessage('q must be a string').trim(),
+];
+
+// Validates the optional include query parameter for reading one question set.
+const includeRules = [
+  query('include').optional().isIn(['questions']).withMessage("include must be 'questions'"),
+];
+
 module.exports = {
   idParam,
   createRules,
   updateRules,
+  listRules,
+  includeRules,
 };
