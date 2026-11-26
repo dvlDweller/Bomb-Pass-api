@@ -47,6 +47,13 @@ async function findPlayerSeat(sessionId, userId) {
   });
 }
 
+async function countByQuestionSet(questionSetId, options = {}) {
+  return GameSession.count({
+    where: { question_set_id: questionSetId },
+    transaction: options.transaction,
+  });
+}
+
 async function findRunningSeatElsewhere(userId, excludedSessionId) {
   return Player.findOne({
     where: { user_id: userId },
@@ -65,6 +72,7 @@ module.exports = {
   create,
   createPlayer,
   countPlayers,
+  countByQuestionSet,
   update,
   markSeen,
   listPlayers,

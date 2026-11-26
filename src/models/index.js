@@ -13,6 +13,8 @@ const sequelize = new Sequelize(
 
 const User = require('./user')(sequelize, DataTypes);
 const QuestionSet = require('./question-set')(sequelize, DataTypes);
+const Question = require('./question')(sequelize, DataTypes);
+const Choice = require('./choice')(sequelize, DataTypes);
 const GameSession = require('./game-session')(sequelize, DataTypes);
 const Player = require('./player')(sequelize, DataTypes);
 
@@ -20,6 +22,14 @@ const Player = require('./player')(sequelize, DataTypes);
 // QuestionSet <-> User : question_sets.owner_user_id -> users.user_id
 QuestionSet.belongsTo(User, { foreignKey: 'owner_user_id' });
 User.hasMany(QuestionSet, { foreignKey: 'owner_user_id' });
+
+// QuestionSet <-> Question : questions.question_set_id -> question_sets.question_set_id
+QuestionSet.hasMany(Question, { foreignKey: 'question_set_id', as: 'questions' });
+Question.belongsTo(QuestionSet, { foreignKey: 'question_set_id', as: 'questionSet' });
+
+// Question <-> Choice : choices.question_id -> questions.question_id
+Question.hasMany(Choice, { foreignKey: 'question_id', as: 'choices' });
+Choice.belongsTo(Question, { foreignKey: 'question_id', as: 'question' });
 
 // GameSession <-> User : game_sessions.host_user_id -> users.user_id
 GameSession.belongsTo(User, { foreignKey: 'host_user_id', as: 'host' });
@@ -44,4 +54,4 @@ GameSession.hasMany(Player, { foreignKey: 'session_id' });
 Player.belongsTo(User, { foreignKey: 'user_id' });
 User.hasMany(Player, { foreignKey: 'user_id' });
 
-module.exports = { sequelize, Sequelize, DataTypes, User, QuestionSet, GameSession, Player };
+module.exports = { sequelize, Sequelize, DataTypes, User, QuestionSet, Question, Choice, GameSession, Player };

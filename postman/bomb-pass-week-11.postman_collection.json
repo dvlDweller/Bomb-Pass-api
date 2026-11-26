@@ -928,6 +928,546 @@
       ]
     },
     {
+      "name": "Question bank",
+      "item": [
+        {
+          "name": "M2 - Create sample question set",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{hostToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/question-sets",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "question-sets"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"M2 Sample Set\",\n  \"subject\": \"CS313\",\n  \"description\": \"Question bank fixture\",\n  \"grade_level\": \"10\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"create M2 set returns 201\", function () {\n  pm.response.to.have.status(201);\n});\nconst json = pm.response.json();\npm.collectionVariables.set(\"m2SetId\", json.question_set.question_set_id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "M2 - Paginate question sets",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{hostToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/question-sets?page=1&limit=5",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "question-sets"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "5"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"paginated list returns 200\", function () {\n  pm.response.to.have.status(200);\n});\nconst json = pm.response.json();\npm.test(\"paginated list has data and meta\", function () {\n  pm.expect(json.data).to.be.an(\"array\");\n  pm.expect(json.meta).to.be.an(\"object\");\n});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "M2 - Empty search",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{hostToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/question-sets?q=ZZZZ_NO_MATCH",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "question-sets"
+              ],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "ZZZZ_NO_MATCH"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"empty search returns 200\", function () {\n  pm.response.to.have.status(200);\n});\nconst json = pm.response.json();\npm.test(\"empty search has no data\", function () {\n  pm.expect(json.data).to.be.an(\"array\");\n  pm.expect(json.data.length).to.eql(0);\n});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "M2 - Invalid sort",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{hostToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/question-sets?sort=password",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "question-sets"
+              ],
+              "query": [
+                {
+                  "key": "sort",
+                  "value": "password"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"invalid sort returns 400\", function () {\n  pm.response.to.have.status(400);\n});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "M2 - Read set with questions",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{hostToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/question-sets/1?include=questions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "question-sets",
+                "1"
+              ],
+              "query": [
+                {
+                  "key": "include",
+                  "value": "questions"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"include questions returns 200\", function () {\n  pm.response.to.have.status(200);\n});\nconst json = pm.response.json();\npm.test(\"questions are included\", function () {\n  pm.expect(json.question_set.questions).to.be.an(\"array\");\n});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "M2 - Create question",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{hostToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/question-sets/{{m2SetId}}/questions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "question-sets",
+                "{{m2SetId}}",
+                "questions"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"text\": \"What color is the sky?\",\n  \"type\": \"multiple_choice\",\n  \"correct_index\": 1,\n  \"time_limit_seconds\": 10,\n  \"choices\": [\n    \"Green\",\n    \"Blue\",\n    \"Red\",\n    \"Yellow\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"create question returns 201\", function () {\n  pm.response.to.have.status(201);\n});\nconst json = pm.response.json();\npm.test(\"question has four choices\", function () {\n  pm.expect(json.question.choices.length).to.eql(4);\n});\npm.test(\"correct index is 1\", function () {\n  pm.expect(json.question.correct_index).to.eql(1);\n});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "M2 - Multiple correct indices",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{hostToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/question-sets/{{m2SetId}}/questions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "question-sets",
+                "{{m2SetId}}",
+                "questions"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"text\": \"Bad question\",\n  \"type\": \"multiple_choice\",\n  \"correct_index\": [\n    0,\n    1\n  ],\n  \"time_limit_seconds\": 10,\n  \"choices\": [\n    \"A\",\n    \"B\",\n    \"C\",\n    \"D\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"multiple correct indices returns 400\", function () {\n  pm.response.to.have.status(400);\n});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "M2 - Player creates question",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{playerToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/question-sets/{{m2SetId}}/questions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "question-sets",
+                "{{m2SetId}}",
+                "questions"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"text\": \"Player question\",\n  \"type\": \"multiple_choice\",\n  \"correct_index\": 0,\n  \"time_limit_seconds\": 10,\n  \"choices\": [\n    \"A\",\n    \"B\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"player creating question returns 403\", function () {\n  pm.response.to.have.status(403);\n});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "M2 - Mutate used question set",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{hostToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/question-sets/1/questions/1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "question-sets",
+                "1",
+                "questions",
+                "1"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"text\": \"Mutated question\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"mutating a used set returns 409\", function () {\n  pm.response.to.have.status(409);\n});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "M2 - Upload valid cover",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{hostToken}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "cover",
+                  "type": "file",
+                  "src": "postman/fixtures/cover.png"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/question-sets/{{m2SetId}}/cover",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "question-sets",
+                "{{m2SetId}}",
+                "cover"
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"valid cover upload returns 200\", function () {\n  pm.response.to.have.status(200);\n});\nconst json = pm.response.json();\npm.test(\"cover path is stored\", function () {\n  pm.expect(json.question_set.cover_path).to.be.a(\"string\");\n});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "M2 - Upload wrong file type",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{hostToken}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "cover",
+                  "type": "file",
+                  "src": "postman/fixtures/not-a-picture.txt"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/question-sets/{{m2SetId}}/cover",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "question-sets",
+                "{{m2SetId}}",
+                "cover"
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"wrong file type returns 400\", function () {\n  pm.response.to.have.status(400);\n});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "M2 - Upload oversized file",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{hostToken}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "cover",
+                  "type": "file",
+                  "src": "postman/fixtures/too-big.png"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/question-sets/{{m2SetId}}/cover",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "question-sets",
+                "{{m2SetId}}",
+                "cover"
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"oversized file returns 413\", function () {\n  pm.response.to.have.status(413);\n});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
       "name": "1. Create a question set successfully",
       "event": [
         {
@@ -1154,8 +1694,8 @@
               "pm.test(\"Status is 200\", function () {",
               "  pm.response.to.have.status(200);",
               "});",
-              "pm.test(\"Response contains question_sets array\", function () {",
-              "  const json = pm.response.json();\n  pm.expect(json.question_sets).to.be.an('array');",
+              "pm.test(\"Response contains data array\", function () {",
+              "  const json = pm.response.json();\n  pm.expect(json.data).to.be.an('array');",
               "});"
             ],
             "type": "text/javascript"
@@ -2268,6 +2808,10 @@
     },
     {
       "key": "invalidLoginMessage",
+      "value": ""
+    },
+    {
+      "key": "m2SetId",
       "value": ""
     }
   ]
