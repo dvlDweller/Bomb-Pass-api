@@ -26,13 +26,39 @@ const createRules = [
     .withMessage('bomb_time_limit_seconds must be an integer between 20 and 60'),
 ];
 
-// Validates a change status request body.
+// Validates a change status or progression request body.
+// A request must contain exactly one operation.
 const statusRules = [
   body('status')
-    .notEmpty()
-    .withMessage('status is required')
+    .optional()
     .isIn(['playing', 'ended'])
     .withMessage("status must be one of 'playing' or 'ended'"),
+  body('current_position')
+    .optional()
+    .custom((value) => {
+      if (!Number.isInteger(value)) {
+        throw new Error('current_position must be an integer');
+      }
+      if (value < 1) {
+        throw new Error('current_position must be a positive integer');
+      }
+      return true;
+    }),
+  body().custom((body) => {
+    const hasStatus = body.status !== undefined;
+    const hasPosition = body.current_position !== undefined;
+    if (!hasStatus && !hasPosition) {
+      throw new Error('status or current_position is required');
+    }
+    if (hasStatus && hasPosition) {
+      throw new Error('provide either status or current_position, not both');
+    }
+    const allowedFields = ['status', 'current_position'];
+    if (Object.keys(body).some((field) => !allowedFields.includes(field))) {
+      throw new Error('unexpected field in request body');
+    }
+    return true;
+  }),
 ];
 
 // Validates a join/rejoin request body.

@@ -16,9 +16,11 @@ module.exports = (sequelize, DataTypes) =>
       bomb_expires_at: { type: DataTypes.DATE, allowNull: true },
       current_question_id: { type: DataTypes.INTEGER, allowNull: true },
       current_cycle_number: { type: DataTypes.INTEGER, allowNull: false, defaultValue: 1 },
+      current_position: { type: DataTypes.INTEGER, allowNull: true, defaultValue: null },
       question_expires_at: { type: DataTypes.DATE, allowNull: true },
       winner_player_id: { type: DataTypes.INTEGER, allowNull: true },
       started_at: { type: DataTypes.DATE, allowNull: true },
+      question_started_at: { type: DataTypes.DATE, allowNull: true, defaultValue: null },
       ended_at: { type: DataTypes.DATE, allowNull: true },
     },
     { tableName: 'game_sessions', timestamps: true, createdAt: 'created_at', updatedAt: false }

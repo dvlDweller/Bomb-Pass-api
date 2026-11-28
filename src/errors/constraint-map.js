@@ -26,4 +26,14 @@ module.exports = {
     code: 'EMAIL_TAKEN',
     message: 'That email is already registered.',
   },
+  uq_answers_player_question: {
+    status: 409,
+    code: 'ANSWER_ALREADY_SUBMITTED',
+    message: 'You have already answered this question.',
+  },
+  uq_answers_player_occurrence: {
+    status: 409,
+    code: 'ANSWER_ALREADY_SUBMITTED',
+    message: 'You have already answered this question.',
+  },
 };

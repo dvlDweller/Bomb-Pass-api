@@ -15,11 +15,9 @@ async function get(req, res) {
 
 async function changeStatus(req, res) {
   const data = matchedData(req, { locations: ['body'] });
-  const session = await gameSessionService.changeStatus(
-    req.params.code,
-    data.status,
-    req.user
-  );
+  const session = data.current_position === undefined
+    ? await gameSessionService.changeStatus(req.params.code, data.status, req.user)
+    : await gameSessionService.advancePosition(req.params.code, data.current_position, req.user);
   res.status(200).json({ session: session });
 }
 
@@ -55,4 +53,30 @@ async function list(req, res) {
   res.status(200).json({ players: exposed });
 }
 
-module.exports = { create, get, changeStatus, join, list };
+function toQuestionJson(question) {
+  return {
+    question_id: question.question_id,
+    text: question.text,
+    type: question.type,
+    time_limit_seconds: question.time_limit_seconds,
+    choices: (question.choices || []).map((choice) => ({
+      choice_id: choice.choice_id,
+      choice_index: choice.choice_index,
+      text: choice.text,
+    })),
+  };
+}
+
+async function getCurrentQuestion(req, res) {
+  const question = await gameSessionService.getCurrentQuestion(req.params.code);
+  res.status(200).json({ question: toQuestionJson(question) });
+}
+
+async function leaderboard(req, res) {
+  const { code } = matchedData(req, { locations: ['params'] });
+  const query = matchedData(req, { locations: ['query'] });
+  const limit = query.limit === undefined ? 10 : Number(query.limit);
+  const players = await gameSessionService.leaderboard(code, limit);
+  res.status(200).json({ leaderboard: players });
+}
+module.exports = { create, get, changeStatus, join, list, getCurrentQuestion, leaderboard };

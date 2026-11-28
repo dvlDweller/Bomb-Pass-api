@@ -17,6 +17,8 @@ const Question = require('./question')(sequelize, DataTypes);
 const Choice = require('./choice')(sequelize, DataTypes);
 const GameSession = require('./game-session')(sequelize, DataTypes);
 const Player = require('./player')(sequelize, DataTypes);
+const Answer = require('./answer')(sequelize, DataTypes);
+const SessionQuestionHistory = require('./session-question-history')(sequelize, DataTypes);
 
 // Associations (foreign keys come from the migrations)
 // QuestionSet <-> User : question_sets.owner_user_id -> users.user_id
@@ -54,4 +56,28 @@ GameSession.hasMany(Player, { foreignKey: 'session_id' });
 Player.belongsTo(User, { foreignKey: 'user_id' });
 User.hasMany(Player, { foreignKey: 'user_id' });
 
-module.exports = { sequelize, Sequelize, DataTypes, User, QuestionSet, Question, Choice, GameSession, Player };
+// GameSession <-> SessionQuestionHistory : session_question_history.session_id -> game_sessions.session_id
+GameSession.hasMany(SessionQuestionHistory, { foreignKey: 'session_id' });
+SessionQuestionHistory.belongsTo(GameSession, { foreignKey: 'session_id' });
+
+// Question <-> SessionQuestionHistory : session_question_history.question_id -> questions.question_id
+Question.hasMany(SessionQuestionHistory, { foreignKey: 'question_id' });
+SessionQuestionHistory.belongsTo(Question, { foreignKey: 'question_id' });
+
+// Player <-> Answer : answers.player_id -> players.player_id
+Player.hasMany(Answer, { foreignKey: 'player_id' });
+Answer.belongsTo(Player, { foreignKey: 'player_id' });
+
+// SessionQuestionHistory <-> Answer : answers.occurrence_id -> session_question_history.occurrence_id
+SessionQuestionHistory.hasMany(Answer, { foreignKey: 'occurrence_id' });
+Answer.belongsTo(SessionQuestionHistory, { foreignKey: 'occurrence_id' });
+
+// Question <-> Answer : answers.question_id -> questions.question_id
+Question.hasMany(Answer, { foreignKey: 'question_id' });
+Answer.belongsTo(Question, { foreignKey: 'question_id' });
+
+// Choice <-> Answer : answers.choice_id -> choices.choice_id
+Choice.hasMany(Answer, { foreignKey: 'choice_id' });
+Answer.belongsTo(Choice, { foreignKey: 'choice_id' });
+
+module.exports = { sequelize, Sequelize, DataTypes, User, QuestionSet, Question, Choice, GameSession, Player, Answer, SessionQuestionHistory };

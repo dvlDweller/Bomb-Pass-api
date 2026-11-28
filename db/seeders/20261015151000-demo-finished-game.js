@@ -296,14 +296,14 @@ module.exports = {
       const wrongChoice2 = choiceByKey[`${question2.question_id}:0`];
 
       const answerSpecs = [
-        { player_id: endedPlayerByName.Alice, occurrence_id: occurrence1, choice_id: correctChoice1, answer_status: 'CORRECT', elapsed_ms: 1000, submitted_at: new Date('2026-09-30T08:06:42.000Z') },
-        { player_id: endedPlayerByName.Alice, occurrence_id: occurrence2, choice_id: correctChoice2, answer_status: 'CORRECT', elapsed_ms: 1200, submitted_at: new Date('2026-09-30T08:08:18.000Z') },
-        { player_id: endedPlayerByName.Bob, occurrence_id: occurrence1, choice_id: correctChoice1, answer_status: 'CORRECT', elapsed_ms: 900, submitted_at: new Date('2026-09-30T08:06:43.000Z') },
-        { player_id: endedPlayerByName.Bob, occurrence_id: occurrence2, choice_id: wrongChoice2, answer_status: 'INCORRECT', elapsed_ms: 4000, submitted_at: new Date('2026-09-30T08:08:30.000Z') },
-        { player_id: endedPlayerByName.Charlie, occurrence_id: occurrence1, choice_id: correctChoice1, answer_status: 'CORRECT', elapsed_ms: 1500, submitted_at: new Date('2026-09-30T08:06:45.000Z') },
-        { player_id: endedPlayerByName.Charlie, occurrence_id: occurrence2, choice_id: null, answer_status: 'TIMEOUT', elapsed_ms: 10000, submitted_at: new Date('2026-09-30T08:08:10.000Z') },
-        { player_id: endedPlayerByName.Diana, occurrence_id: occurrence1, choice_id: wrongChoice1, answer_status: 'INCORRECT', elapsed_ms: 3000, submitted_at: new Date('2026-09-30T08:06:50.000Z') },
-        { player_id: endedPlayerByName.Eric, occurrence_id: occurrence1, choice_id: wrongChoice1, answer_status: 'INCORRECT', elapsed_ms: 2500, submitted_at: new Date('2026-09-30T08:09:00.000Z') },
+        { player_id: endedPlayerByName.Alice, occurrence_id: occurrence1, question_id: question1.question_id, choice_id: correctChoice1, answer_status: 'CORRECT', elapsed_ms: 1000, submitted_at: new Date('2026-09-30T08:06:42.000Z') },
+        { player_id: endedPlayerByName.Alice, occurrence_id: occurrence2, question_id: question2.question_id, choice_id: correctChoice2, answer_status: 'CORRECT', elapsed_ms: 1200, submitted_at: new Date('2026-09-30T08:08:18.000Z') },
+        { player_id: endedPlayerByName.Bob, occurrence_id: occurrence1, question_id: question1.question_id, choice_id: correctChoice1, answer_status: 'CORRECT', elapsed_ms: 900, submitted_at: new Date('2026-09-30T08:06:43.000Z') },
+        { player_id: endedPlayerByName.Bob, occurrence_id: occurrence2, question_id: question2.question_id, choice_id: wrongChoice2, answer_status: 'INCORRECT', elapsed_ms: 4000, submitted_at: new Date('2026-09-30T08:08:30.000Z') },
+        { player_id: endedPlayerByName.Charlie, occurrence_id: occurrence1, question_id: question1.question_id, choice_id: correctChoice1, answer_status: 'CORRECT', elapsed_ms: 1500, submitted_at: new Date('2026-09-30T08:06:45.000Z') },
+        { player_id: endedPlayerByName.Charlie, occurrence_id: occurrence2, question_id: question2.question_id, choice_id: null, answer_status: 'TIMEOUT', elapsed_ms: 10000, submitted_at: new Date('2026-09-30T08:08:10.000Z') },
+        { player_id: endedPlayerByName.Diana, occurrence_id: occurrence1, question_id: question1.question_id, choice_id: wrongChoice1, answer_status: 'INCORRECT', elapsed_ms: 3000, submitted_at: new Date('2026-09-30T08:06:50.000Z') },
+        { player_id: endedPlayerByName.Eric, occurrence_id: occurrence1, question_id: question1.question_id, choice_id: wrongChoice1, answer_status: 'INCORRECT', elapsed_ms: 2500, submitted_at: new Date('2026-09-30T08:09:00.000Z') },
       ];
       for (const spec of answerSpecs) {
         const existing = await firstRow(
@@ -315,7 +315,7 @@ module.exports = {
         if (existing) {
           await queryInterface.bulkUpdate(
             'answers',
-            { choice_id: spec.choice_id, answer_status: spec.answer_status, elapsed_ms: spec.elapsed_ms, submitted_at: spec.submitted_at },
+            { choice_id: spec.choice_id, question_id: spec.question_id, answer_status: spec.answer_status, elapsed_ms: spec.elapsed_ms, submitted_at: spec.submitted_at },
             { answer_id: existing.answer_id },
             { transaction: tx }
           );

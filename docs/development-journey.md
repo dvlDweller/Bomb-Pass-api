@@ -1,15 +1,15 @@
-# Development journey: Bomb Pass API
+﻿# Development journey: Bomb Pass API
 
-Student: Karl Abraham M. Saboco · Section: BSCS 3-2 · Group: Group 7
+Student: Karl Abraham M. Saboco Â· Section: BSCS 3-2 Â· Group: Group 7
 
 One entry per milestone, written the week you did it. Newest at the bottom.
 
-## M1 · Accounts, passwords and tokens
-- Dates worked: Nov 12–17, 2026 · Time spent: Not yet tracked; student to estimate
-- Goal: Install the official Weeks 12–18 kit and implement Milestone 1 authentication and admin user management without losing Week 11 functionality.
+## M1 Â· Accounts, passwords and tokens
+- Dates worked: Nov 12â€“17, 2026 Â· Time spent: Not yet tracked; student to estimate
+- Goal: Install the official Weeks 12â€“18 kit and implement Milestone 1 authentication and admin user management without losing Week 11 functionality.
 - What I built: Installed the kit and merged the Week 11 user model/repository changes; added nullable `password_hash` migration `20261112100000-add-password-to-users.js` and idempotent seeder `20261112100100-demo-passwords.js`; added `src/security/password.js` and `src/security/token.js`; configured JWT/bcrypt/CORS environment values; implemented `auth.validator.js`, `auth.service.js`, `auth.controller.js`, and `auth.routes.js`; implemented `user.service.js`, `user.controller.js`, and `user.routes.js`; added user unique-constraint mappings; mounted `/auth` and `/users`; updated README authentication documentation; migrated the Postman collection to JWT Bearer authentication; created the separate `bomb_pass_test` database.
 - Authentication behavior implemented: registration always creates `PLAYER`; login uses `findForLogin` and `password.matches`; unknown school IDs and wrong passwords return identical `INVALID_CREDENTIALS`; `/auth/me` requires a valid Bearer token; admin listing and role management are ADMIN-only; self-role changes return `SELF_ROLE_CHANGE`.
-- Evidence: commits `75d74c9` (password migration and seeder), `5eeb6b9` (JWT authentication and admin management), `7626f74` (documentation), and `d2d3240` (Postman JWT migration); pull request: https://github.com/dvlDweller/Bomb-Pass-api/pull/6; GitHub Actions run #25 succeeded with 27 checks covering criteria A–G; local verification with `CHECK_WEEK=12` against `bomb_pass_test` on port 5433 passed 38 checks with 0 failures, including H and I; `GET /api/v1/health` returned HTTP 200.
+- Evidence: commits `75d74c9` (password migration and seeder), `5eeb6b9` (JWT authentication and admin management), `7626f74` (documentation), and `d2d3240` (Postman JWT migration); pull request: https://github.com/dvlDweller/Bomb-Pass-api/pull/6; GitHub Actions run #25 succeeded with 27 checks covering criteria Aâ€“G; local verification with `CHECK_WEEK=12` against `bomb_pass_test` on port 5433 passed 38 checks with 0 failures, including H and I; `GET /api/v1/health` returned HTTP 200.
 - Postman evidence: 5 login requests passed; 17 Accounts requests passed; 16 session regression requests passed; 28 of the 29 original Week 11 requests were exercised successfully. The DELETE question-set request was intentionally skipped to preserve data and is not claimed as passed.
 - Problem I hit: GitHub rejected a push with GH007 because the commit author email was private; a later push failed because the GitHub OAuth token lacked the `workflow` scope needed to push `.github/workflows/check.yml`.
 - How I solved it: Set the Git author email to a verified/public address and re-committed; re-authenticated GitHub CLI with the `workflow` scope (`gh auth refresh -s workflow`) before pushing the workflow file.
@@ -20,15 +20,15 @@ One entry per milestone, written the week you did it. Newest at the bottom.
 
 AI disclosure: ChatGPT and OpenCode Desktop assisted with planning, repository inspection, implementation prompts, code-generation and editing assistance, reviewing, debugging, and documentation. The student personally reviewed the work, executed Postman tests and local verification, and performed the Git staging, commits, push, and pull-request operations. The student remains responsible for understanding and explaining every submitted line of code.
 
-## M2 · The question bank
-- Dates worked: November 25–26, 2026 (confirmed commit activity; earlier work sessions may not be fully recorded) · Time spent: Not tracked; a reliable total cannot be reconstructed
+## M2 Â· The question bank
+- Dates worked: November 25â€“26, 2026 (confirmed commit activity; earlier work sessions may not be fully recorded) Â· Time spent: Not tracked; a reliable total cannot be reconstructed
 - Goal: Implement the Week 13 question bank with paginated question-set lists, nested question management, frozen-set protection, and cover uploads while preserving Week 11 and M1 behavior.
 - What I built: Added Question and Choice models, their central registration and associations, and a question repository; extended QuestionSet pagination, safe search, allow-listed sorting, and `?include=questions`; implemented nested question GET, POST, PATCH, and DELETE endpoints with owner-only authorization; validated question and choice payloads; assigned server-generated zero-based `choice_index` values; saved questions and choices transactionally; added frozen-set protection when a game session references a set; added the nullable `cover_path` migration and model field; added the ownership-checked cover upload route and `/uploads` static serving; added 12 Question bank Postman requests and an oversized upload fixture.
 - Evidence: Earlier M1 baseline verification: `npm run check` with `CHECK_WEEK=12` against `bomb_pass_test` on port 5433 passed 38 checks with 0 failures, including H and I. M2 Postman Stage 1 passed 17 requests and 28 assertions with 0 failures. M2 Postman Stage 2 passed 33 requests and 67 assertions with 0 failures, including 5 login requests and 28 safe Week 11 regression requests. The destructive question-set DELETE request was intentionally skipped to preserve data and is not claimed as passed. The `cover_path` migration `20261112100200-add-cover-path-to-question-sets.js` was applied to `bomb_pass_test`; all 15 migrations were up. Pull request #7: https://github.com/dvlDweller/Bomb-Pass-api/pull/7
   Commit references:
-  - e404105 — Question and Choice models
-  - 60fa0f0 — Question bank API endpoints
-  - a293ab1 — Postman requests and upload fixtures
+  - e404105 â€” Question and Choice models
+  - 60fa0f0 â€” Question bank API endpoints
+  - a293ab1 â€” Postman requests and upload fixtures
 - Problem I hit: PostgreSQL 18 was stopped, causing ECONNREFUSED on port 5433; Newman was initially unavailable locally; port 3001 was occupied by an existing Node process whose database target could not be verified.
 - How I solved it: The student manually started PostgreSQL 18; installed Newman 6.2.3 globally without changing project dependencies; ran the dedicated Stage 2 API on port 3002 and left the unidentified existing process on port 3001 untouched.
 - Decision I made and why: Use server-generated zero-based `choice_index` values instead of a `questions.position` column, so clients cannot dictate stored choice positions; freeze a question set after any game session references it, including ended sessions, so its questions cannot change after use; make nested question content owner-only, while retaining the existing ADMIN metadata access behavior; store uploaded cover references as relative `/uploads/covers/...` paths rather than absolute filesystem paths.
@@ -36,12 +36,20 @@ AI disclosure: ChatGPT and OpenCode Desktop assisted with planning, repository i
 - What I would explain to a classmate: A question and its choices must be saved all-or-nothing. The service opens one Sequelize transaction and forwards it to every repository operation. If a write fails, the transaction should roll back rather than leave an incomplete question.
 - AI disclosure: ChatGPT and OpenCode were used for planning and implementation guidance, coding assistance, source reviews and audits, and running and reviewing validation and Postman test results. The student reviewed the work and remains responsible for understanding and explaining every submitted line of code.
 
-## M3 · Gameplay
+## M3 — Gameplay
 
-## M4 · Automated tests and server preparation
+- Dates worked: November 27–28, 2026
+- Goal: Implement M3 gameplay: question timing, current-question endpoint, answer submission, leaderboard, completion finalization, and the Postman whole-game flow.
+- What I built: Added nullable `question_started_at` and `current_position` to game sessions; implemented gameplay initialization, transactional question progression, and a public GET `/sessions/:code/question` that does not expose `correct_index`; implemented POST `/sessions/:code/answers` using `question_id` and `choice_id`, server-controlled timing, duplicate-answer protection, and transactional score updates; added answer and session-question-history models and repositories; implemented GET `/sessions/:code/leaderboard?limit=10` with shared score-based ranks; implemented host-ended finalization so remaining ACTIVE players become FINISHED while eliminated and forfeited players remain unchanged; persisted unique sequential `final_rank` placements separately from the shared M3 leaderboard rank; preserved the `/results` Hub-key contract; added the Postman `Play a whole game` folder.
+- Tests and evidence: Unit tests: 11 suites, 75 tests passed. Newman: 92 requests executed, 155 assertions passed, zero failures. Three newly registered players joined and answered both questions. Duplicate answer returned 409 `ANSWER_ALREADY_SUBMITTED`. Skipping directly from position 1 to 3 returned 409 `NOT_NEXT_QUESTION`. Leaderboard returned all three FINISHED players. `/results?since=` reported the played game with at least three completed players. All 18 migrations and four seeders completed on the isolated `bomb_pass_test` database.
+- Defects found and fixes: The migration `20261112100500-add-question-id-to-answers.js` initially passed the Sequelize transaction as a third argument to `queryInterface.addConstraint()`, causing a PostgreSQL lock wait during the foreign-key operation. The defect was corrected by placing `transaction` inside the second options object for both `addConstraint()` calls. The subsequent fresh database reset completed all migrations and seeders successfully.
+- Important design decisions: M3 gameplay uses one-pass sequential question progression; the API uses server-controlled answer timing and scoring; equal-score M3 leaderboard ranks are shared; persisted `players.final_rank` remains unique and is calculated separately; host-ended sessions have no winner and receive no normal completion EXP; normal last-player and duration-limit ending mechanisms are not implemented in this M3 scope. The final Postman collection contains 92 requests.
+- Remaining limitations: Normal last-player and duration-limit ending mechanisms remain for a later milestone. M4 server preparation has not been implemented.
+- AI assistance disclosure: OpenCode and ChatGPT assisted with implementation planning, code review, troubleshooting, and documentation. The student reviewed the changes and executed the reported tests and Newman run.
+## M4 Â· Automated tests and server preparation
 
-## M5 · API documentation and deployment
+## M5 Â· API documentation and deployment
 
-## M6 · The SE1 portfolio and the release
+## M6 Â· The SE1 portfolio and the release
 
-## M7 · The Test Report
+## M7 Â· The Test Report
